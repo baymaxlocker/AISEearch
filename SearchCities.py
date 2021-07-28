@@ -108,8 +108,24 @@ def create_tree_heuristics(node_list):
 	
 	return G
 
-# Sorts Cities by they H(n) + G(n) values
-#def min_sort(source,target,neighbour_list):
+# Determines the total cost of the path to goal
+def cost(road_to_goal,info):
+
+	total_cost = 0
+
+	for i in range(len(road_to_goal)-1):
+		print("City in path: "+str(road_to_goal[i]))
+		for city in info:
+			if ((road_to_goal[i] == city[0]) and (road_to_goal[i+1] == city[1])):
+				total_cost += int(city[2])
+			
+			if ((road_to_goal[i] == city[1]) and (road_to_goal[i+1] == city[0])):
+				print("Combo "+str(road_to_goal[i])+" - "+str(road_to_goal[i+1]))
+				total_cost += int(city[2])
+
+#		print("Total cost = "+str(total_cost))
+
+	return total_cost
 
 
 
@@ -192,7 +208,7 @@ class Search(Node):
 		self.iteration = 0
 		
 		options_w_values=[]
-		cost=0
+		self.cost = 0
 				
 		while self.queue:
 
@@ -236,6 +252,8 @@ class Search(Node):
 						self.return_path.append(goalCity)
 						self.find_path(goalCity)
 						print("Path to goal is "+str(self.return_path))
+						self.cost = cost(self.return_path,info)
+						print("Total cost/distance for this trip: "+str(self.cost))
 						break
 			else:
 				self.visited.append(s)  
