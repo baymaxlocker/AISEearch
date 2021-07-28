@@ -45,7 +45,7 @@ def open_file(in_file,searchType):
 		
 	return roadsList
 	
-	# Returns a master list with all the info in it
+# Returns a master list with all the info in it
 def combine(list1,list2):
 	
 		# Add lat lon to first city
@@ -211,7 +211,7 @@ class Search(Node):
 			#	print("node is "+str(node)+", goal city is "+goalCity+" and cities is "+str(cities))
 				for match_city in nList:
 					
-					if s == cities[0] and match_city == cities[1]:
+					if (s == cities[0] and match_city == cities[1]) or (s == cities[1] and match_city == cities[0]):
 						options_w_values.append(cities)
 
 			
@@ -219,7 +219,11 @@ class Search(Node):
 			print("Sorted options"+str(options_w_values))
 			
 			for city_pos in options_w_values:
-				options.append(city_pos[1])
+				if s == city_pos[0]:
+					options.append(city_pos[1])
+				
+				else:
+					options.append(city_pos[0])
 		
 			nList = options
 			print("Updated nList is :"+str(nList))
@@ -231,7 +235,7 @@ class Search(Node):
 						print("Found:", goalCity,"")
 						self.return_path.append(goalCity)
 						self.find_path(goalCity)
-						print("Return path is "+str(self.return_path))
+						print("Path to goal is "+str(self.return_path))
 						break
 			else:
 				self.visited.append(s)  
