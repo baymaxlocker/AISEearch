@@ -23,6 +23,8 @@ def open_file(in_file,searchType):
 					mystring = words
 					myString = re.sub(r"[\n\t\s]*", "", mystring)
 					roadsList.append(myString.strip().split(','))
+			
+			print(" Full list: "+str(roadsList))
 
 		if searchType == "A*":
 
@@ -38,11 +40,10 @@ def open_file(in_file,searchType):
 					roadsList.append(myString.strip().split(','))
 
 			roads_allinfo = combine(roadsList,lat_lon_list)
-#		print("Here's the road list: "+str(roadsList))
+			roadsList = roads_allinfo
+			print(" Full list: "+str(roads_allinfo))
 		
-		print(" Full list: "+str(roads_allinfo))
-		
-	return roads_allinfo
+	return roadsList
 	
 	# Returns a master list with all the info in it
 def combine(list1,list2):
@@ -107,6 +108,10 @@ def create_tree_heuristics(node_list):
 	
 	return G
 
+# Sorts Cities by they H(n) + G(n) values
+#def min_sort(source,target,neighbour_list):
+
+
 
 class Node(object):
 	def __init__(self, parent, name):
@@ -148,6 +153,7 @@ class Search(Node):
 						self.queue.append(neighbor)
 						print("The stack is "+str(self.queue))
 	 
+
 	def dfs(self, node, goalCity):
 		self.visited.append(node)
 		self.stack.append(node)
@@ -174,20 +180,66 @@ class Search(Node):
 							print("The stack is "+str(self.stack))
 							self.iteration+=1
 
-	def astar(self,startcity, goalcity):
-		print("Group 7 is awesome!")
+	
+	def astar(self,node, goalCity, info):
+		
+#		print("info list: "+str(info))
 
-# procedure DFS_iterative(G, v) is
-#     let S be a stack
-#     S.push(iterator of G.adjacentEdges(v))
-#     while S is not empty do
-#         if S.peek().hasNext() then
-#             w = S.peek().next()
-#             if w is not labeled as discovered then
-#                 label w as discovered
-#                 S.push(iterator of G.adjacentEdges(w))
-#         else
-#             S.pop() 
+		self.visited.append(node)
+		self.queue.append(node)
+		self.node = str(node)
+		self.neighborList = (G.adj[node])
+		self.iteration = 0
+		
+		options_w_values=[]
+		cost=0
+				
+		while self.queue:
+
+			print("Queue at start of iteration " +str(self.iteration))
+			print("Queue is "+str(self.queue))
+			s = self.queue.pop()
+			print("City to expand is: "+str(s))
+			
+			nList = self.getNeighbor(s)
+			print("nList is "+str(nList))
+			options_w_values=[]
+			options=[]
+
+			
+			for cities in info:
+			#	print("node is "+str(node)+", goal city is "+goalCity+" and cities is "+str(cities))
+				for match_city in nList:
+					
+					if s == cities[0] and match_city == cities[1]:
+						options_w_values.append(cities)
+
+			
+			options_w_values.sort(key=lambda x:x[8], reverse=True)
+			print("Sorted options"+str(options_w_values))
+			
+			for city_pos in options_w_values:
+				options.append(city_pos[1])
+		
+			nList = options
+			print("Updated nList is :"+str(nList))
+
+
+			if (s == goalCity):
+						#print("These are visited nodes\n >>>", self.visited, "\n")
+						
+						print("Found:", goalCity,"")
+						self.return_path.append(goalCity)
+						self.find_path(goalCity)
+						print("Return path is "+str(self.return_path))
+						break
+			else:
+				self.visited.append(s)  
+				for neighbor in nList:
+					if neighbor not in self.visited and neighbor not in self.queue:
+						self.queue.append(neighbor)
+						print("The queue is "+str(self.queue))
+						self.iteration+=1
 
 
 
@@ -212,8 +264,8 @@ class Search(Node):
 		for n in neighbor:
 			if n == self.visited[0]:
 				self.return_path.insert(0, n)
-				print("Here is the path to the goal: ")
-				print(self.return_path)
+				#print("Here is the path to the goal: ")
+				#print(self.return_path)
 				break
 		 
 			if n in self.visited and n not in self.return_path:
@@ -234,7 +286,8 @@ def callingSearch(startCity, goalCity, typeOfSearch):
 		g.dfs(startCity, goalCity) 
 
 	elif typeOfSearch == "A*":
-		g.astar(startCity, goalCity) 
+		info = road_list
+		g.astar(startCity, goalCity, info) 
 
 
 if __name__ == "__main__":
